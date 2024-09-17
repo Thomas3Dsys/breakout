@@ -23,6 +23,7 @@
   <ItemGroup>
     <Compile Include="ball.py" />
     <Compile Include="brick.py" />
+    <Compile Include="code_graveyard.py" />
     <Compile Include="Day87_Proj6_Breakout.py" />
     <Compile Include="field.py" />
     <Compile Include="gamelogic.py" />

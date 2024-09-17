@@ -1,6 +1,7 @@
 class Level():
     
-    def __init__(self, **kwargs):
+    def __init__(self, iteration, **kwargs):
+        self.iteration = iteration
         #Size of the game window
         self.screensize = kwargs.get('screensize', (720,800))
         
@@ -14,7 +15,7 @@ class Level():
         #Paddle details
         self.x_plain_coord = kwargs.get('x_plain_coord', 40)
         self.default_paddle_size =  kwargs.get('default_paddle_size',(100,20))
-        self.paddle_fast_step =  kwargs.get('paddle_fast_step',55)
+        self.paddle_fast_step =  kwargs.get('paddle_fast_step',70)
         self.paddle_step =  kwargs.get('paddle_step',35)
         self.paddle_slow_step =  kwargs.get('paddle_slow_step',10)
         
@@ -28,7 +29,7 @@ class Level():
         self.powerup_size =  kwargs.get('power_up_size',(50,15))
         self.powerup_active_time_multipliers =  kwargs.get('powerup_active_time_multipliers',(.8, 1.3) )
         self.powerup_step_variation =  kwargs.get('powerup_step_variation',(3,7))
-        self.bigpaddle_active_time =  kwargs.get('bigpaddle_active_time',30)
+        self.bigpaddle_active_time =  kwargs.get('bigpaddle_active_time',20)
         self.smallpaddle_active_time= kwargs.get('smallpaddle_active_time',7)
         self.slow_active_time = kwargs.get('slow_active_time', 10)
         self.fast_active_time = kwargs.get('fast_active_time', 7)

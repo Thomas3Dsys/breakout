@@ -1,66 +1,57 @@
 
-import random
+# import random
 from turtle import Screen
 import time
 import keyboard
-from paddlesize import PaddleSize
-from scoreboard import Scoreboard
-from paddle import Paddle
-from ball import Ball
-from field import BrickField
-from powerup import PowerUp
+
 from gamemodifier import GameModifier
 from level import Level
 from gamelogic import GameLogic
 
-#defaults
-level1 = Level()
+#move to levels file?
+levels = [ Level(1,
+              brick_array_size = (4,1), # (9,2)
+              default_paddle_size = (120,22),
+              default_wait_time =.06,
+              num_powerups = 8,
+              bigpaddle_active_time = 30
+                ),
+          Level(2, 
+              brick_array_size = (9,4),
+              num_powerups = 6
+              ),
+          Level(3, 
+              screensize = (1000,800),
+              brick_array_size = (12,6),
+              ball_size = 18,
+              default_paddle_size = (90,18),
+              default_wait_time =.04,
+              num_powerups = 2,
+              bigpaddle_active_time = 10
+              )    
+          ]
 
-#change whas is needed
-level2 = Level(
-    num_powerups = 10,
-    slow_wait_time = .1,
-    default_wait_time = .05,
-    fast_wait_time = .0325,
-    ball_size = 20,
-    powerup_step_variation = (3,7),
-    powerup_size = (50,15),
-    bigpaddle_active_time = 30,
-    smallpaddle_active_time=7,
-    slow_active_time = 10,
-    fast_active_time = 7,
-    good_powerup_score_add = 2,
-    bad_powerup_score_add = 4,
-    x_plain_coord = 40,
-    default_paddle_size = (100,20),
-    paddle_fast_step = 55,
-    paddle_step = 35,
-    paddle_slow_step = 10)
 
-cur_level = level1
+
 
 screen = Screen()
-game = GameLogic(cur_level, screen)
-screen.title("BRICK BRAKE")
-screen.tracer(0) # only draw when asked to on refresh of screen
-wait_time = cur_level.default_wait_time
 
-offpower = {
-            "start_time":time.time(),
-            "active_length":0,
-            "is_active":False,
-            "activated":False
-                             }
+def setup_screen(screensize):
+    global screen    
+    screen = Screen()
+    screen.mode("world")
+    screen.setup(width=screensize[0], height=screensize[1])
+    screen.setworldcoordinates(0,0,screensize[0], screensize[1])
+    screen.bgcolor("black")
+    screen.title("BRICK BRAKE")
+    screen.tracer(0) # only draw when asked to on refresh of screen
 
 
-def restart():
-    global paddle, field, scoreboard, ball,  is_paused, screen
-    paddle.reset()
-    field.reset()
-    scoreboard.reset()
-    ball.reset()
-    screen.update()
-    is_paused = True
+def reset_screen(screensize):
+    global screen    
+    screen = Screen()
+    screen.setup(width=screensize[0], height=screensize[1])
+
 
 def exit_app():
     global is_game_on 
@@ -77,84 +68,67 @@ def pause():
     is_paused = not is_paused   
     game.scoreboard.pause(is_paused)
 
-##CHEATS / TESTING
-def small():
-    if keyboard.is_pressed("alt"): 
-         power = {
-                                 "start_time":time.time(),
-                                 "active_length":20,
-                                 "is_active":True,
-                                 "activated":False
-                             }
-         game.active_modifiers[GameModifier.SMALLPADDLE] = power
-     
-def large():
-    if keyboard.is_pressed("alt"): 
-         power = {
-                                 "start_time":time.time(),
-                                 "active_length":20,
-                                 "is_active":True,
-                                 "activated":False
-                             }
-                    
-         game.active_modifiers[GameModifier.BIGPADDLE] = power
-     
-def default():
-    if keyboard.is_pressed("alt"):
-       
-        game.active_modifiers[GameModifier.BIGPADDLE] = offpower
-        game.active_modifiers[GameModifier.SMALLPADDLE] = offpower
+def brake():##### CHEAT / DEBUG #####
+    game.field.remove_brick(game.field.bricks[0].id)
+    game.field.remove_dead_bricks()
+    screen.update()
+
+def go_fast():##### CHEAT / DEBUG #####
+     global wait_time
+     wait_time = 0
+
+
+
+def setup_listen():
+    global screen    
+    #Handle Inputs
+    screen.listen()
+    screen.onkey(key="Left", fun=game.paddle.left)#do_left)
+    screen.onkey(key="Right", fun=game.paddle.right)#do_right
+    screen.onkey(key="p", fun=pause)
+    screen.onkey(key="space", fun=start)
     
-def go_fast():
-    global wait_time
-    if keyboard.is_pressed("alt"):
-        wait_time = cur_level.fast_wait_time
-        print("FAST")
+    screen.onkey(key="f", fun=go_fast)##### CHEAT / DEBUG #####
+    screen.onkey(key="b", fun=brake)##### CHEAT / DEBUG #####
+   
+    #screen.onkey(key="r", fun=set_restart_flag)
+    screen.onkey(key="x", fun=exit_app)
 
-def regular_speed():
-    global wait_time
-    if keyboard.is_pressed("alt"):
-        wait_time = cur_level.default_wait_time
-        print("REGULAR")
 
-def go_slow():#increase wait time
-    global wait_time
-    if keyboard.is_pressed("alt"):
-        wait_time = cur_level.slow_wait_time
-        print("SLOW")
-## END CHEATS / TESTING
+    screen.onkey(key="Tab", fun=game.scoreboard.toggle_menu)
 
+
+level_itr = 0
+setup_screen(levels[level_itr].screensize)
+game = GameLogic(levels[level_itr])
+setup_listen()
+start_display_y = game.field.get_brick_min_y()
+game.scoreboard.display_start_info(f"Level {game.level.iteration}",start_display_y)
+
+wait_time = game.level.default_wait_time
 
 is_paused = True
 is_game_on = True
-is_round_on = True
-
-game.scoreboard.write_menu()
-game.ball.reset()
-game.field.draw_field()
-game.populate_powerups()
-game.screen.update()
 
 
-#Handle Inputs
-screen.listen()
-screen.onkey(key="Left", fun=game.paddle.left)
-screen.onkey(key="Right", fun=game.paddle.right)
-screen.onkey(key="p", fun=pause)
-screen.onkey(key="space", fun=start)
-screen.onkey(key="r", fun=restart)
-screen.onkey(key="x", fun=exit_app)
+def next_level():
+    global level_itr, game,is_game_on
+    level_itr += 1
+    if level_itr >= len(levels):
+       game.scoreboard.win()
+       is_game_on = False
+       return
+    
+    reset_screen(levels[level_itr].screensize)
+    game.new_level(levels[level_itr])
+    
+    start_display_y = game.field.get_brick_min_y() 
+    game.scoreboard.level_complete(f"Level {game.level.iteration}",start_display_y)
+    
 
-screen.onkey(key="1", fun=go_slow)
-screen.onkey(key="2", fun=regular_speed)
-screen.onkey(key="3", fun=go_fast)
+    
 
-screen.onkey(key="Tab", fun=game.toggle_menu)
-
-screen.onkey(key="s", fun=small)
-screen.onkey(key="l", fun=large)
-screen.onkey(key="d", fun=default)
-
+print(f"wait:{wait_time}")
 
 #Main Game Loop
 while is_game_on:
@@ -163,7 +137,6 @@ while is_game_on:
         game.handle_gamemodifiers()
 
         #game speed
-        print(f"w:{wait_time}")
         time.sleep(wait_time)
         
         #check game over
@@ -172,32 +145,37 @@ while is_game_on:
             is_game_on = False
     
         #return a hit ball
-        if game.paddle.is_ball_hit(game.ball.get_position()) :
+        if game.paddle.is_ball_hit(game.ball.get_position(), game.ball.size) :
             distance = game.paddle.get_hit_distance(game.ball.get_position())
             game.ball.hit_paddle(distance)
         
         #what brick did the ball hit?
-        b_id = game.field.handle_hit(game.ball.get_position(), game.ball.size)
-        if b_id  > 0:
+        b_id = game.field.get_hit_id(game.ball.get_position(), game.ball.size)
+        if b_id  > -1:
             game.ball.hit_brick() #redirect ball
             if game.field.has_powerup(b_id):#handle if brick has a power up to drop
                 power_up = game.field.get_powerup(b_id)
                 new_power_up = power_up.drop_powerup()
                 game.powerups.append(new_power_up)
-                    
-            if game.scoreboard.increase_score():
-                is_game_on = False # game is won
-                pass
-            else:
-                game.scoreboard.display()
+            game.field.remove_brick(b_id)#remove hit brick
+            game.scoreboard.increase_score()
+        
+        if game.is_level_complete():
+            next_level()
+            is_paused = True # game is won
+            #pass
+        else:
+            game.scoreboard.display()
                 
         #move and catch power ups, do game modification when caught
         game.handle_powerups()      
         
         #move the ball each iteration
         game.ball.move()
-        
-    game.screen.update()
+     
+ 
+    screen.update()
+   
 
-game.screen.update()
+screen.update()
 screen.exitonclick()

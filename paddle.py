@@ -7,15 +7,14 @@ class Paddle(Turtle):
     
     def __init__(self,  screensize, **kwargs):
         super().__init__()
-        self.speed("fastest")
         
+        self.speed("fastest")
         self.x_plain_coord = kwargs.get('x_plain_coord',"default value")
         self.size = kwargs.get('size',(100,20))
         self.speed = kwargs.get('speed', 5)
         self.fast_step = kwargs.get('fast_step', 10)
         self.slow_step= kwargs.get('slow_step',2)
         self.step = kwargs.get('step', '10')
-
 
         screen = Screen() 
         sX = int(self.size[0]/2)
@@ -58,22 +57,15 @@ class Paddle(Turtle):
                 )
             )
         
-            
         self.width = self.size[0]
         self.default_width = self.size[0]
         self.height = self.size[1]
         self.screensize = screensize
         self.color("white")
         self.penup()
-        
-        self.reset()
-       
-
         self.paddlesize = PaddleSize.DEFAULT
-        
-       
-
         self.setheading(90)
+        self.reset()
 
 
         # screen.register_shape(
@@ -129,8 +121,8 @@ class Paddle(Turtle):
 
 
 #use size of object
-    def is_ball_hit(self, ball_pos):
-        if  abs(self.xcor() - ball_pos[0]) <= self.width/2 and abs(self.ycor() - ball_pos[1]) <= self.height/2:
+    def is_ball_hit(self, ball_pos, ball_size):
+        if abs(self.xcor() +  - ball_pos[0] + ball_size/2) <= self.width/2 and abs(self.ycor() - ball_pos[1]+ ball_size/2) <= self.height/2:
             return True
         return False
 
@@ -148,8 +140,8 @@ class Paddle(Turtle):
             paddle_right =self.xcor() + self.width / 2
             item_left = item_pos[0] - item_size[0] /2
             item_right = item_pos[0] + item_size[0] /2
-            if self._between(item_left, paddle_left, paddle_right):
-                return True
+            if self._between(item_left, paddle_left, paddle_right) or self._between(item_right , paddle_left, paddle_right): 
+               return True
         return False
 
 
@@ -167,8 +159,6 @@ class Paddle(Turtle):
         offset = ball_pos[0] -self.xcor()
         #print(f"ball hit paddle {offset} from the center of the paddle")
         return offset
-            
-
     
     
     def reset(self):
@@ -177,5 +167,19 @@ class Paddle(Turtle):
         
     def recenter(self):
         self.goto(self.screensize[0]/2,self.x_plain_coord)
+
+
+
+    def clear():
+        self.screen.clear()
+
+    # def clear_it(self):
+    #     self.x_plain_coord = 0
+    #     self.size = (0,0)
+    #     self.speed = 0
+    #     self.fast_step = 0
+    #     self.slow_step= 0
+    #     self.step = 0
+    #     self.clear()
         
         

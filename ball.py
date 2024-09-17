@@ -5,6 +5,7 @@ class Ball(Turtle):
     
     def __init__(self, screensize, starting_pos, step = 10, size = 20):
         super().__init__()
+        self.clear()
         self.speed("fastest")
         self.starting_pos = starting_pos
         self.color("white")
@@ -16,10 +17,10 @@ class Ball(Turtle):
         self.shape("circle")
         self.step = step
         self.screensize = screensize
-        
+        self.reset()
         
     def reset(self):
-        self.ball_heading = random.randint(210,330)
+        self.ball_heading = random.randint(250,290)
         self.goto(self.starting_pos)
 
     def get_position(self):
@@ -73,9 +74,9 @@ class Ball(Turtle):
 
     def has_fallen(self):
         if self.ycor() <= 2 :
-            return True
-            #temporary ricochet for testing
-            #self.ball_heading  = 360  - self.ball_heading
+            #return True
+            #CHEAT/DEBUG
+            self.ball_heading  = 360  - self.ball_heading
         return False
 
     

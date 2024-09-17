@@ -8,6 +8,7 @@ class Scoreboard(Turtle):
     
     def __init__(self,  screensize, maxscore):
         super().__init__()
+        self.clear()
         self.speed("fastest")
         self.penup()
         self.hideturtle()
@@ -19,20 +20,29 @@ class Scoreboard(Turtle):
         self.game_started = False
         self.toggle_menu()
         self.mod_display = ""
-        self.display()
-        self.start()
         self.modifiers = {
            GameModifier.FAST: False,
            GameModifier.SLOW: False,
            GameModifier.SMALLPADDLE: False,
            GameModifier.BIGPADDLE: False
            }
-        
        
-    
-    def start(self):
-        self.goto(self.screensize[0]/2,self.screensize[1]/2)
-        self.write("Press Space Bar to Start", False, "center", ('MLB Padres', 40, 'bold'))
+    def level_complete(self,level_name, ypos):
+        self.display()
+        self.color("white")
+        self.goto(self.screensize[0]/2,ypos-60)
+        self.write("LEVEL COMPLETE", False, "center", ('Impact', 30))
+        self.goto(self.screensize[0]/2,ypos-160)
+        self.write(level_name, False, "center", ('Impact', 65))
+        self.goto(self.screensize[0]/2,ypos - 220)
+        self.write("Press Space Bar to Start", False, "center", ('courier', 20, 'bold'))
+
+    def display_start_info(self, level_name, ypos):
+        self.color("white")
+        self.goto(self.screensize[0]/2,ypos-180)
+        self.write(level_name, False, "center", ('Impact', 100))
+        self.goto(self.screensize[0]/2,ypos - 220)
+        self.write("Press Space Bar to Start", False, "center", ('courier', 20, 'bold'))
 
     def do_start(self):
         self.menus_is_diaplayed = False
@@ -50,7 +60,7 @@ class Scoreboard(Turtle):
         self.color("white")
         self.penup()
         self.goto(self.screensize[0]-40,self.screensize[1]-60)
-        self.write(f"{self.score}", False, "right", ('MLB Padres', 40, 'bold'))
+        self.write(f"{self.score}", False, "right", ('Impact', 40, 'bold'))
         if not self.menus_is_diaplayed:
             self.draw_tab_text()
 
@@ -60,10 +70,9 @@ class Scoreboard(Turtle):
    
     def increase_score(self, amount = 1):
         self.score += amount
-        if self.score == self.maxscore:
-           self.win()
-           return True
-        return False
+        
+
+        
             
     def write_menu(self):
         self.color("gray")
@@ -76,12 +85,12 @@ class Scoreboard(Turtle):
         p - pause
         x - exit game 
 
-        Cheats!
-        1, 2, 3,  change the speed
-        s,l,d paddle size
-        
-        
 Press Tab to toggle this menu"""
+
+# Cheats!
+        #1, 2, 3,  change the speed
+        #s,l,d paddle size
+
         
         self.write(menu, False, "left", ('courier', 10, 'bold'))
 
@@ -113,7 +122,7 @@ Press Tab to toggle this menu"""
         if is_paused:
             self.goto(self.screensize[0]/2,self.screensize[1]/2)
             self.color("white")
-            self.write("PAUSED", False, "center", ('MLB Padres', 60, 'bold'))
+            self.write("PAUSED", False, "center", ('Impact', 60, 'bold'))
         else:
             self.display()
             
@@ -142,6 +151,7 @@ Press Tab to toggle this menu"""
         
 
     def reset(self):
+        self.clear()
         self.score = 0
         self.display()
-        self.start()
+        

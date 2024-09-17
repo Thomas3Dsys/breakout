@@ -8,9 +8,8 @@ class Brick(Turtle):
     
     def __init__(self, position, size, color, id):
         super().__init__()
+        #self.clear()
         self.speed("fastest")
-        
-        #self.penup()
         self.size = size
         self.id = id
         self.alive = 1
@@ -45,10 +44,13 @@ class Brick(Turtle):
             )
 
         self.shape("brick")
-        self.color(color)
-        self.goto(position)
         
+        self.goto(position[0]-hX,position[1])
+        self.color("white")
         self.write(self.id,False, "right", ('Arial', 10))
+        
+        self.goto(position)
+        self.color(color)
         #print(f"created brick: {self.id}")
         self.setheading(90)
         self.stamp_id = self.stamp()
@@ -79,8 +81,8 @@ class Brick(Turtle):
         if self.alive == 0:
             return False
         
-        ball_right_in_x_area= self._between(ball_pos[0] + ball_size / 2, self.anchor_position[0] - self.brick_width/2,self.anchor_position[0] + self.brick_width/2)
-        ball_left_in_x_area = self._between(ball_pos[0] - ball_size / 2, self.anchor_position[0]- self.brick_width/2,self.anchor_position[0] + self.brick_width/2)
+        ball_right_in_x_area = self._between(ball_pos[0] + ball_size / 2, self.anchor_position[0] - self.brick_width/2,self.anchor_position[0] + self.brick_width/2)
+        ball_left_in_x_area  = self._between(ball_pos[0] - ball_size / 2, self.anchor_position[0]- self.brick_width/2,self.anchor_position[0] + self.brick_width/2)
 
         x_hit = ball_right_in_x_area or  ball_left_in_x_area
         
@@ -88,16 +90,16 @@ class Brick(Turtle):
             return False
         #top of bottom?
         #anchor is bottom left
-        brick_bottom = self.anchor_position[1] 
+        brick_bottom = self.anchor_position[1] - self.brick_height
         brick_top = self.anchor_position[1] + self.brick_height
 
-        ball_bottom_in_y_area =   self._between(ball_pos[1]  -  ball_size / 2, brick_bottom, brick_top)
-        ball_top_in_y_area =   self._between(ball_pos[1]  +  ball_size / 2, brick_bottom, brick_top)
+        ball_bottom_in_y_area = self._between(ball_pos[1]  -  ball_size / 2, brick_bottom, brick_top)
+        ball_top_in_y_area    = self._between(ball_pos[1]  +  ball_size / 2, brick_bottom, brick_top)
        
         y_hit = ball_bottom_in_y_area or ball_top_in_y_area
         
         if y_hit:
-            self.remove()
+            #self.remove() #removed by field
             return True
     
 

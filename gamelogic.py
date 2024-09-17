@@ -16,17 +16,11 @@ from level import Level
 
 class GameLogic():
     
-    def __init__(self, cur_level, screen):
+    def __init__(self, cur_level):
         self.level = cur_level
-        self.screen = screen
-        self.screen.mode("world")
-        self.screen.setup(width=self.level.screensize[0], height=self.level.screensize[1])
-        self.screen.setworldcoordinates(0,0,self.level.screensize[0], self.level.screensize[1])
-        screen.bgcolor("black")
-        
 
         self.active_modifiers = {}
-        center = (self.level.screensize[0]/2, cur_level.screensize[1]/2)
+        ball_start_position = (self.level.screensize[0]/2, cur_level.screensize[1]/2-40)
         
         self.paddle = Paddle(
                 screensize = self.level.screensize, 
@@ -38,32 +32,70 @@ class GameLogic():
                 )
 
         self.field = BrickField(
-                screen = self.screen, 
                 screensize = self.level.screensize,field_padding =(20,100),
                 xcount= self.level.brick_array_size[0],
                 ycount=self.level.brick_array_size[1],
                 brick_size=self.level.brick_size,
                 brick_padding=(15,15) 
                 )
-
+        self.field.draw_field()
+        
         self.scoreboard = Scoreboard(
                 self.level.screensize,
                 self.level.brick_array_size[0] * self.level.brick_array_size[1] 
                 )
+        self.scoreboard.display()
         
         self.ball = Ball(    
                 self.level.screensize, 
-                center,
+                ball_start_position,
                 self.level.ball_size
                 )
 
         self.powerups = []
+        
+        self.scoreboard.write_menu()
+        self.ball.reset()
+        self.populate_powerups()
+        self.paddle.reset()
+        self.last_print = 0
+
+    def new_level(self, cur_level):
+        self.level = cur_level
+        self.active_modifiers = {}
+        #ball_start_position = (self.level.screensize[0]/2, cur_level.screensize[1]/2-40)
+        
+        self.ball.reset()
+        score = self.scoreboard.score 
+        self.scoreboard.reset()
+        self.scoreboard.score = score 
+        self.paddle.reset()
+        
+        self.scoreboard.screensize = self.level.screensize
+        self.paddle.screensize = self.level.screensize
+        self.ball.screensize = self.level.screensize
+        self.field.screensize = self.level.screensize
+        
+        self.field.xcount= self.level.brick_array_size[0]
+        self.field.ycount=self.level.brick_array_size[1]
+        self.field.brick_size=self.level.brick_size
+        self.field.draw_field()
+        self.powerups = []
+        self.scoreboard.write_menu()
+        self.populate_powerups()
+        self.last_print = 0
 
 
     def populate_powerups(self):
-        for i in range(0,self.level.num_powerups):
+        num_to_populate = min(self.field.field_size,self.level.num_powerups)
+
+        for i in range(0,num_to_populate):
             speed  = random.randint(self.level.powerup_step_variation[0],self.level.powerup_step_variation[1])
-            self.field.add_random_powerup(PowerUp(power=random.choice(list(GameModifier)), step=speed, size=self.level.powerup_size))
+            
+            randomPowerUp = GameModifier.NONE
+            while randomPowerUp == GameModifier.NONE:
+                randomPowerUp = random.choice(list(GameModifier))
+            self.field.add_random_powerup(PowerUp(power=randomPowerUp, step=speed, size=self.level.powerup_size))
         
 
     def toggle_menu(self):
@@ -71,6 +103,8 @@ class GameLogic():
 
     def handle_powerups(self, ):
         remove_powerup_indexes = []
+        
+
         #for all active power ups
         for p in range(0,len(self.powerups)):
             powerup = self.powerups[p]
@@ -104,15 +138,18 @@ class GameLogic():
                 self.active_modifiers[powerup.engage()] = power
 
             # is power up dead? remove
-            if powerup.get_position()[1] <= 0:
+            if powerup.get_position()[1] <= -powerup.shape_height/2:
                 powerup.alive = 0
                 remove_powerup_indexes.append(p)
+
+        
+        for powerup in self.powerups:
+            powerup.move()
 
         for q in range(0,len(remove_powerup_indexes)):
             self.powerups.pop(q)
 
-        for powerup in self.powerups:
-            powerup.move()
+        
             
     def handle_fast_powerup(self):
         global wait_time
@@ -128,11 +165,13 @@ class GameLogic():
                     fast['is_active'] = False
                     self.scoreboard.modify_active_powerups(GameModifier.FAST, False)
                     wait_time = self.level.default_wait_time
+                    print(f"wait:{wait_time}")
                 if fast['is_active']:
                     print(f"Fast Time Left :{fast['active_length'] - elapsed}")  
                     if not fast['activated']:
                         fast['activated'] = True
                         wait_time = self.level.fast_wait_time
+                        print(f"wait:{wait_time}")
                         fast['start_time'] = time.time()
                         self.scoreboard.modify_active_powerups(GameModifier.SLOW, False)
                         self.scoreboard.modify_active_powerups(GameModifier.FAST, True)
@@ -151,18 +190,28 @@ class GameLogic():
         if slow:
             if slow['is_active']:
                 elapsed = time.time() - slow['start_time']
-                if elapsed > slow['active_length']:
-                     slow['is_active'] = False
-                     self.scoreboard.modify_active_powerups(GameModifier.SLOW, False)
-                     wait_time = self.level.default_wait_time
+                if elapsed > slow['active_length']: # Time has elapsed
+                     slow['is_active'] = False # deactivate
+                     self.scoreboard.modify_active_powerups(GameModifier.SLOW, False) # remove from scoreboard
+                     wait_time = self.level.default_wait_time # reset affects
+                     print(f"wait:{wait_time}") # print to console
+                     self.last_print = 0 # reset printing restrictor
                 if slow['is_active']:
-                      print(f"Slow Time Left :{slow['active_length'] - elapsed}")  
-                      if not slow['activated']:
-                        slow['activated'] = True
-                        wait_time = self.level.slow_wait_time   
-                        slow['start_time'] = time.time()
-                        self.scoreboard.modify_active_powerups(GameModifier.FAST, False)
-                        self.scoreboard.modify_active_powerups(GameModifier.SLOW, True)
+                     if not slow['activated']:# is active but not activated yet
+                        self.last_print = 0 #reset this for useage
+                        wait_time = self.level.slow_wait_time # enable effect
+                        print(f"wait:{wait_time}") # print to console
+                        slow['start_time'] = time.time() # set the timer
+                        self.scoreboard.modify_active_powerups(GameModifier.SLOW, True) # reset the scoreboard
+                        self.scoreboard.modify_active_powerups(GameModifier.FAST, False) # will not longer be fast
+                        slow['activated'] = True # will not be activated
+                        
+                     time_left = slow['active_length'] - elapsed # calcualte time left
+                     
+                     if int(time_left) > self.last_print: # only print for ever new second
+                        print(f"Slow Time Left :{time_left}")  #print
+                        self.last_print = int(time_left) # update print restritor counter
+                      
             #else:
              #   wait_time = default_wait_time
                 #scoreboard.modify_active_powerups(GameModifier.SLOW, False)
@@ -229,3 +278,11 @@ class GameLogic():
     
         if not fast and not slow:
             wait_time = self.level.default_wait_time
+            print(f"wait:{wait_time}")
+
+    def is_level_complete(self):
+        if self.field.no_more_bricks():
+            
+            return True
+        return False
+
