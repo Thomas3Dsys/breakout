@@ -1,4 +1,5 @@
 
+from pickle import NONE
 import random
 from turtle import Screen
 import time
@@ -155,119 +156,119 @@ class GameLogic():
 
         
             
-    def handle_fast_powerup(self):
-        global wait_time
-        if(GameModifier.FAST in self.active_modifiers):
-            fast = self.active_modifiers[GameModifier.FAST]
-        else:
-            fast = None
+    # def handle_fast_powerup(self):
+    #     global wait_time
+    #     if(GameModifier.FAST in self.active_modifiers):
+    #         fast = self.active_modifiers[GameModifier.FAST]
+    #     else:
+    #         fast = None
         
-        if fast:
-            if fast['is_active']:
-                elapsed = time.time() - fast['start_time']
-                if elapsed > fast['active_length']:
-                    fast['is_active'] = False
-                    self.scoreboard.modify_active_powerups(GameModifier.FAST, False)
-                    wait_time = self.level.default_wait_time
-                    print(f"wait:{wait_time}")
-                if fast['is_active']:
-                    print(f"Fast Time Left :{fast['active_length'] - elapsed}")  
-                    if not fast['activated']:
-                        fast['activated'] = True
-                        wait_time = self.level.fast_wait_time
-                        print(f"wait:{wait_time}")
-                        fast['start_time'] = time.time()
-                        self.scoreboard.modify_active_powerups(GameModifier.SLOW, False)
-                        self.scoreboard.modify_active_powerups(GameModifier.FAST, True)
-            else:
-                wait_time = self.level.default_wait_time
-                self.scoreboard.modify_active_powerups(GameModifier.FAST, False)
-        return fast
+    #     if fast:
+    #         if fast['is_active']:
+    #             elapsed = time.time() - fast['start_time']
+    #             if elapsed > fast['active_length']:
+    #                 fast['is_active'] = False
+    #                 self.scoreboard.modify_active_powerups(GameModifier.FAST, False)
+    #                 wait_time = self.level.default_wait_time
+    #                 print(f"wait:{wait_time}")
+    #             if fast['is_active']:
+    #                 print(f"Fast Time Left :{fast['active_length'] - elapsed}")  
+    #                 if not fast['activated']:
+    #                     fast['activated'] = True
+    #                     wait_time = self.level.fast_wait_time
+    #                     print(f"wait:{wait_time}")
+    #                     fast['start_time'] = time.time()
+    #                     self.scoreboard.modify_active_powerups(GameModifier.SLOW, False)
+    #                     self.scoreboard.modify_active_powerups(GameModifier.FAST, True)
+    #         else:
+    #             wait_time = self.level.default_wait_time
+    #             self.scoreboard.modify_active_powerups(GameModifier.FAST, False)
+    #     return fast
 
-    def handle_slow_powerup(self):
-        global wait_time
-        if(GameModifier.SLOW in self.active_modifiers):
-            slow = self.active_modifiers[GameModifier.SLOW]
-        else:
-            slow = None
+    # def handle_slow_powerup(self):
+    #     global wait_time
+    #     if(GameModifier.SLOW in self.active_modifiers):
+    #         slow = self.active_modifiers[GameModifier.SLOW]
+    #     else:
+    #         slow = None
         
-        if slow:
-            if slow['is_active']:
-                elapsed = time.time() - slow['start_time']
-                if elapsed > slow['active_length']: # Time has elapsed
-                     slow['is_active'] = False # deactivate
-                     self.scoreboard.modify_active_powerups(GameModifier.SLOW, False) # remove from scoreboard
-                     wait_time = self.level.default_wait_time # reset affects
-                     print(f"wait:{wait_time}") # print to console
-                     self.last_print = 0 # reset printing restrictor
-                if slow['is_active']:
-                     if not slow['activated']:# is active but not activated yet
-                        self.last_print = 0 #reset this for useage
-                        wait_time = self.level.slow_wait_time # enable effect
-                        print(f"wait:{wait_time}") # print to console
-                        slow['start_time'] = time.time() # set the timer
-                        self.scoreboard.modify_active_powerups(GameModifier.SLOW, True) # reset the scoreboard
-                        self.scoreboard.modify_active_powerups(GameModifier.FAST, False) # will not longer be fast
-                        slow['activated'] = True # will not be activated
+    #     if slow:
+    #         if slow['is_active']:
+    #             elapsed = time.time() - slow['start_time']
+    #             if elapsed > slow['active_length']: # Time has elapsed
+    #                  slow['is_active'] = False # deactivate
+    #                  self.scoreboard.modify_active_powerups(GameModifier.SLOW, False) # remove from scoreboard
+    #                  wait_time = self.level.default_wait_time # reset affects
+    #                  print(f"wait:{wait_time}") # print to console
+    #                  self.last_print = 0 # reset printing restrictor
+    #             if slow['is_active']:
+    #                  if not slow['activated']:# is active but not activated yet
+    #                     self.last_print = 0 #reset this for useage
+    #                     wait_time = self.level.slow_wait_time # enable effect
+    #                     print(f"wait:{wait_time}") # print to console
+    #                     slow['start_time'] = time.time() # set the timer
+    #                     self.scoreboard.modify_active_powerups(GameModifier.SLOW, True) # reset the scoreboard
+    #                     self.scoreboard.modify_active_powerups(GameModifier.FAST, False) # will not longer be fast
+    #                     slow['activated'] = True # will not be activated
                         
-                     time_left = slow['active_length'] - elapsed # calcualte time left
+    #                  time_left = slow['active_length'] - elapsed # calcualte time left
                      
-                     if int(time_left) > self.last_print: # only print for ever new second
-                        print(f"Slow Time Left :{time_left}")  #print
-                        self.last_print = int(time_left) # update print restritor counter
+    #                  if int(time_left) > self.last_print: # only print for ever new second
+    #                     print(f"Slow Time Left :{time_left}")  #print
+    #                     self.last_print = int(time_left) # update print restritor counter
                       
-            #else:
-             #   wait_time = default_wait_time
-                #scoreboard.modify_active_powerups(GameModifier.SLOW, False)
+    #         #else:
+    #          #   wait_time = default_wait_time
+    #             #scoreboard.modify_active_powerups(GameModifier.SLOW, False)
                 
-        return slow
+    #     return slow
         
-    def handle_bigpaddle_powerup(self):
-        global paddle
-        if(GameModifier.BIGPADDLE in self.active_modifiers):
-            paddle_power = self.active_modifiers[GameModifier.BIGPADDLE]
-        else:
-            paddle_power = None
+    # def handle_bigpaddle_powerup(self):
+    #     global paddle
+    #     if(GameModifier.BIGPADDLE in self.active_modifiers):
+    #         paddle_power = self.active_modifiers[GameModifier.BIGPADDLE]
+    #     else:
+    #         paddle_power = None
         
-        if paddle_power:
-            if paddle_power['is_active']:
-                elapsed = time.time() - paddle_power['start_time']
-                if elapsed > paddle_power['active_length']:
-                    paddle_power['is_active'] = False
-                    self.scoreboard.modify_active_powerups(GameModifier.BIGPADDLE, False)
-                    self.paddle.set_paddle_shape(PaddleSize.DEFAULT)
-                if paddle_power['is_active']:
-                    print(f"Big Paddle Time Left :{paddle_power['active_length'] - elapsed}")
-                    if not paddle_power['activated']:
-                        paddle_power['start_time'] = time.time()
-                        self.paddle.set_paddle_shape(PaddleSize.LARGE)
-                        paddle_power['activated'] = True
-                        self.scoreboard.modify_active_powerups(GameModifier.SMALLPADDLE, False)
-                        self.scoreboard.modify_active_powerups(GameModifier.BIGPADDLE, True)
+    #     if paddle_power:
+    #         if paddle_power['is_active']:
+    #             elapsed = time.time() - paddle_power['start_time']
+    #             if elapsed > paddle_power['active_length']:
+    #                 paddle_power['is_active'] = False
+    #                 self.scoreboard.modify_active_powerups(GameModifier.BIGPADDLE, False)
+    #                 self.paddle.set_paddle_shape(PaddleSize.DEFAULT)
+    #             if paddle_power['is_active']:
+    #                 print(f"Big Paddle Time Left :{paddle_power['active_length'] - elapsed}")
+    #                 if not paddle_power['activated']:
+    #                     paddle_power['start_time'] = time.time()
+    #                     self.paddle.set_paddle_shape(PaddleSize.LARGE)
+    #                     paddle_power['activated'] = True
+    #                     self.scoreboard.modify_active_powerups(GameModifier.SMALLPADDLE, False)
+    #                     self.scoreboard.modify_active_powerups(GameModifier.BIGPADDLE, True)
      
-    def handle_smallpaddle_powerup(self):
-        global paddle
-        if(GameModifier.SMALLPADDLE in self.active_modifiers):
-            paddle_power = self.active_modifiers[GameModifier.SMALLPADDLE]
-        else:
-            paddle_power = None
+    # def handle_smallpaddle_powerup(self):
+    #     global paddle
+    #     if(GameModifier.SMALLPADDLE in self.active_modifiers):
+    #         paddle_power = self.active_modifiers[GameModifier.SMALLPADDLE]
+    #     else:
+    #         paddle_power = None
         
-        if paddle_power:
-            if paddle_power['is_active']:
-                elapsed = time.time() - paddle_power['start_time']
-                if elapsed > paddle_power['active_length']:
-                    paddle_power['is_active'] = False
-                    self.scoreboard.modify_active_powerups(GameModifier.SMALLPADDLE, False)
-                    self.paddle.set_paddle_shape(PaddleSize.DEFAULT)
-                if paddle_power['is_active']:
-                    print(f"Small Paddle Time Left :{paddle_power['active_length'] - elapsed}")  
-                    if not paddle_power['activated']:
-                        paddle_power['start_time'] = time.time()
-                        self.paddle.set_paddle_shape(PaddleSize.SMALL)
-                        paddle_power['activated'] = True
-                        self.scoreboard.modify_active_powerups(GameModifier.BIGPADDLE, False)
-                        self.scoreboard.modify_active_powerups(GameModifier.SMALLPADDLE, True)
-        return paddle_power
+    #     if paddle_power:
+    #         if paddle_power['is_active']:
+    #             elapsed = time.time() - paddle_power['start_time']
+    #             if elapsed > paddle_power['active_length']:
+    #                 paddle_power['is_active'] = False
+    #                 self.scoreboard.modify_active_powerups(GameModifier.SMALLPADDLE, False)
+    #                 self.paddle.set_paddle_shape(PaddleSize.DEFAULT)
+    #             if paddle_power['is_active']:
+    #                 print(f"Small Paddle Time Left :{paddle_power['active_length'] - elapsed}")  
+    #                 if not paddle_power['activated']:
+    #                     paddle_power['start_time'] = time.time()
+    #                     self.paddle.set_paddle_shape(PaddleSize.SMALL)
+    #                     paddle_power['activated'] = True
+    #                     self.scoreboard.modify_active_powerups(GameModifier.BIGPADDLE, False)
+    #                     self.scoreboard.modify_active_powerups(GameModifier.SMALLPADDLE, True)
+    #     return paddle_power
 
     def handle_gamemodifiers(self):
         global wait_time
@@ -275,14 +276,16 @@ class GameLogic():
         if not any([self.active_modifiers[m]['is_active'] for m in self.active_modifiers]):
             return
 
-        fast = self.handle_fast_powerup()
-        slow = self.handle_slow_powerup()
-        self.handle_bigpaddle_powerup()
-        self.handle_smallpaddle_powerup()
+        for modifier in list(GameModifier):
+            self.manage_gamemodifier(modifier)
+        # fast = self.handle_fast_powerup()
+        # slow = self.handle_slow_powerup()
+        # self.handle_bigpaddle_powerup()
+        # self.handle_smallpaddle_powerup()
     
-        if not fast and not slow:
-            wait_time = self.level.default_wait_time
-            print(f"wait:{wait_time}")
+        # if not fast and not slow:
+        #     wait_time = self.level.default_wait_time
+        #     print(f"wait:{wait_time}")
 
     def is_level_complete(self):
         if self.field.no_more_bricks():
@@ -290,3 +293,91 @@ class GameLogic():
             return True
         return False
 
+    def do_modifier_affect(self,cur_modifier, affect_state):
+         match cur_modifier:                
+            case GameModifier.BIGPADDLE:
+                if affect_state == True:
+                    self.paddle.set_paddle_shape(PaddleSize.LARGE)
+                else:
+                    self.paddle.set_paddle_shape(PaddleSize.DEFAULT)
+                print(f"Large Paddle:{affect_state}")
+
+            case GameModifier.SMALLPADDLE:
+                if affect_state == True:
+                    self.paddle.set_paddle_shape(PaddleSize.SMALL)
+                else:
+                    self.paddle.set_paddle_shape(PaddleSize.DEFAULT)
+                print(f"Small Paddle:{affect_state}")
+
+            case GameModifier.FAST:
+                if affect_state == True: 
+                    wait_time = self.level.fast_wait_time 
+                else:
+                    wait_time = self.level.default_wait_time
+                print(f"wait:{wait_time}") # print to console
+
+            case GameModifier.SLOW:
+                if affect_state == True: 
+                    wait_time = self.level.slow_wait_time 
+                else:
+                    wait_time = self.level.default_wait_time
+                print(f"wait:{wait_time}") # print to console
+                
+            case _:
+                return 
+        
+
+
+    def get_opposite_modifier(self, cur_modifier:GameModifier):
+        match cur_modifier:                
+            case GameModifier.BIGPADDLE:
+                return GameModifier.SMALLPADDLE
+            case GameModifier.SMALLPADDLE:
+                return GameModifier.BIGPADDLE
+            case GameModifier.FAST:
+                return GameModifier.SLOW
+            case GameModifier.SLOW:
+                return GameModifier.FAST
+            case _:
+                return GameModifier.NONE
+
+    def manage_gamemodifier(self, cur_modifier:GameModifier):
+        global wait_time
+        if cur_modifier == GameModifier.NONE:
+            return 
+        if cur_modifier in self.active_modifiers:
+            power_obj = self.active_modifiers[cur_modifier]
+        else:
+            power_obj = None
+        
+        opposite_modifier = self.get_opposite_modifier(cur_modifier)
+
+        if power_obj:
+            if power_obj['is_active']:
+                elapsed = time.time() - power_obj['start_time']
+                if elapsed > power_obj['active_length']: # Time has elapsed
+                     power_obj['is_active'] = False # deactivate
+                     self.scoreboard.modify_active_powerups(cur_modifier, False) # remove from scoreboard
+                     self.do_modifier_affect(cur_modifier, False)
+                     self.last_print = 1000 # reset printing restrictor
+                     
+                if power_obj['is_active']:
+                     if not power_obj['activated']:# is active but not activated yet
+                        self.last_print = 1000 #reset this for useage
+                        self.do_modifier_affect(cur_modifier, True)
+                        power_obj['start_time'] = time.time() # set the timer
+                        self.scoreboard.modify_active_powerups(cur_modifier, True) # reset the scoreboard
+                        self.scoreboard.modify_active_powerups(opposite_modifier, False) # will not longer be fast
+                        power_obj['activated'] = True # will not be activated
+                        
+                     time_left = power_obj['active_length'] - elapsed # calcualte time left
+                     
+                     if int(time_left) < self.last_print: # only print for ever new second
+                        print(f"{cur_modifier} Time Left :{int(time_left)}")  #print
+                        self.last_print = int(time_left) # update print restritor counter
+                      
+            #else:
+             #   wait_time = default_wait_time
+                #scoreboard.modify_active_powerups(GameModifier.SLOW, False)
+                
+        return power_obj
