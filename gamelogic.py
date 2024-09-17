@@ -70,6 +70,9 @@ class GameLogic():
         self.scoreboard.reset()
         self.scoreboard.score = score 
         self.paddle.reset()
+        self.field.reset()
+
+
         
         self.scoreboard.screensize = self.level.screensize
         self.paddle.screensize = self.level.screensize
@@ -79,6 +82,7 @@ class GameLogic():
         self.field.xcount= self.level.brick_array_size[0]
         self.field.ycount=self.level.brick_array_size[1]
         self.field.brick_size=self.level.brick_size
+        
         self.field.draw_field()
         self.powerups = []
         self.scoreboard.write_menu()

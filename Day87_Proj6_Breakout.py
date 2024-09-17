@@ -68,8 +68,21 @@ def pause():
     is_paused = not is_paused   
     game.scoreboard.pause(is_paused)
 
+restart_flag = False
+def set_restart_flag():
+    global restart_flag
+    restart_flag = True    
+
+def restart():
+    global level_itr, restart_flag, is_paused
+    restart_flag = False  
+    is_paused = True
+    level_itr -= 1
+    next_level(True)
+
+
 def brake():##### CHEAT / DEBUG #####
-    game.field.remove_brick(game.field.bricks[0].id)
+    game.field.remove_brick_by_id(game.field.bricks[0].id)
     game.field.remove_dead_bricks()
     screen.update()
 
@@ -91,7 +104,7 @@ def setup_listen():
     screen.onkey(key="f", fun=go_fast)##### CHEAT / DEBUG #####
     screen.onkey(key="b", fun=brake)##### CHEAT / DEBUG #####
    
-    #screen.onkey(key="r", fun=set_restart_flag)
+    screen.onkey(key="r", fun=set_restart_flag)
     screen.onkey(key="x", fun=exit_app)
 
 
@@ -111,9 +124,10 @@ is_paused = True
 is_game_on = True
 
 
-def next_level():
+def next_level(restart = False):
     global level_itr, game,is_game_on
     level_itr += 1
+    
     if level_itr >= len(levels):
        game.scoreboard.win()
        is_game_on = False
@@ -123,7 +137,10 @@ def next_level():
     game.new_level(levels[level_itr])
     
     start_display_y = game.field.get_brick_min_y() 
-    game.scoreboard.level_complete(f"Level {game.level.iteration}",start_display_y)
+    if restart:
+        game.scoreboard.display_start_info(f"Level {game.level.iteration}",start_display_y)
+    else:
+        game.scoreboard.level_complete(f"Level {game.level.iteration}",start_display_y)
     
 
     
@@ -157,7 +174,7 @@ while is_game_on:
                 power_up = game.field.get_powerup(b_id)
                 new_power_up = power_up.drop_powerup()
                 game.powerups.append(new_power_up)
-            game.field.remove_brick(b_id)#remove hit brick
+            game.field.remove_brick_by_id(b_id)#remove hit brick
             game.scoreboard.increase_score()
         
         if game.is_level_complete():
@@ -173,7 +190,10 @@ while is_game_on:
         #move the ball each iteration
         game.ball.move()
      
- 
+    if restart_flag:
+        restart()
+
+
     screen.update()
    
 

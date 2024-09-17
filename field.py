@@ -36,7 +36,7 @@ class BrickField():
                 #self.brick_ids.append(id)
                 id = id + 1
                 x_position = x_position + self.brick_size[0] + self.brick_x_padding
-            y_position = y_position -  (self.brick_size[1]+ self.brick_y_padding)
+            y_position = y_position -  (self.brick_size[1]+ self.brick_y_padding) 
         
         #self.screen.update()   
         
@@ -81,12 +81,16 @@ class BrickField():
 
         return -1
     
-    def remove_brick(self, b_id):
-         #get index of brick id: brick.id
-         b_index = [index for index, brick in enumerate(self.bricks) if brick.id == b_id][0]
-         self.bricks[b_index].alive = 0
-         self.bricks[b_index].remove()
-         self.bricks.pop(b_index)
+    def remove_brick_by_id(self, b_id):
+        b_index = [index for index, brick in enumerate(self.bricks) if brick.id == b_id][0]
+        self.remove_brick_by_index(b_index)
+    
+    def remove_brick_by_index(self, index):
+         self.bricks[index].alive = 0
+         self.bricks[index].remove()
+         self.bricks.pop(index)
+
+
 
     def has_brick(self, b_id):
          found_bricks = [index for index, brick in enumerate(self.bricks) if brick.id == b_id]
@@ -99,5 +103,8 @@ class BrickField():
         return brick.has_power()
 
     def reset(self):
-         self.bricks = []
+        #for brick in self.bricks:
+        for index in range(len(self.bricks)-1,-1,-1):
+           self.remove_brick_by_index(index)
+        self.bricks = []
          
