@@ -1,62 +1,175 @@
 from turtle import Turtle, Screen
-
+import keyboard
+from paddlesize import PaddleSize
+from powerup import PowerUp
 
 class Paddle(Turtle):
     
-    def __init__(self,  screensize, x_plain_coord, size, speed):
+    def __init__(self,  screensize, x_plain_coord, size):
         super().__init__()
+        
+        screen = Screen() 
+        sX = int(size[0]/2)
+        sY = int(size[1]/2)
+        
+        sXL = int(size[0]/2)+20
+        sYL = int(size[1]/2)+2
+        
+        sXS = int(size[0]/2)-20
+        sYS = int(size[1]/2)-2
+        screen.register_shape(
+            "lpaddle",
+                (
+                    (-sXL,sYL),
+                    (sXL,sYL),
+                    (sXL,-sYL),
+                    (-sXL,-sYL)
+                )
+            )
+        
+            
+        screen.register_shape(
+            "spaddle",
+                (
+                    (-sXS,sYS),
+                    (sXS,sYS),
+                    (sXS,-sYS),
+                    (-sXS,-sYS)
+                )
+            )
+        
+            
+        screen.register_shape(
+            "paddle",
+                (
+                    (-sX,sY),
+                    (sX,sY),
+                    (sX,-sY),
+                    (-sX,-sY)
+                )
+            )
+        
+            
+        self.width = size[0]
+        self.default_width = size[0]
+        self.height = size[1]
         self.screensize = screensize
         self.color("white")
         self.penup()
         self.x_plain_coord = x_plain_coord
         self.reset()
-        self.is_going_left = False
-        self.is_going_right = False
-        screen = Screen()
-        self.speed = speed
-        
-        self.xbounds = screensize[0]
-        #self.y_position = -int(screen[1]/2)
-        
-        self.b_width = size[0]
-        self.b_height = size[1]
-        
-        sX = int(size[0]/2)
-        sY = int(size[1]/2)
-
-        screen.register_shape(
-            "paddle",
-           (
-                (sY/ 2, 0),
-                (-sY / 2, 0),
-                (-sY/ 2, sX),
-                (sY / 2, sX)
-           )
-                                  )
-        self.shape("paddle")
-        self.setheading(180)
+       
+        self.speed = 5
+        self.fastspeed = 10
+        self.slowspeed = 2
         self.step = 10
- 
+        self.paddlesize = PaddleSize.DEFAULT
+        
+       
+
+        self.setheading(90)
+
+
+        # screen.register_shape(
+        #         "paddle",
+        #            (
+        #                (-sX,sY),
+        #                (sX,sY),
+        #                (sX,-sY),
+        #                (-sX,-sY)
+        #            )
+        #        )
+        # self.shape("paddle")
+
+    def set_paddle_shape(self, paddle_size:PaddleSize):
+        self.paddle_size = paddle_size
+        if self.paddle_size == PaddleSize.DEFAULT:
+            self.shape("paddle")
+            self.width = self.default_width
+        if self.paddle_size == PaddleSize.LARGE:
+            self.shape("lpaddle")
+            self.width = self.default_width + 20
+        if self.paddle_size == PaddleSize.SMALL:
+            self.shape("spaddle")
+            self.width = self.default_width - 20
+   
         
     def left(self):
-        if self.xcor() > self.b_width/2:
-            self.forward(self.step * self.speed)
+        self.goto((self.xcor()),self.x_plain_coord)
+        if self.xcor() > self.width/2:
+            self.setheading(180)
+            if keyboard.is_pressed("shift"):
+                self.forward(self.step * self.fastspeed)
+            elif keyboard.is_pressed("control"):
+                self.forward(self.step * self.slowspeed)
+            else:
+                self.forward(self.step * self.speed)
+            self.setheading(90)
     
+
     def right(self):
-        if self.xcor() < self.screensize[0]:# - self.b_width/2:
-            self.backward(self.step * self.speed)
+        self.goto((self.xcor()),self.x_plain_coord)
+        if self.xcor() < self.screensize[0] - self.width/2:
+            self.setheading(180)
+            if keyboard.is_pressed("shift"):
+                self.backward(self.step * self.fastspeed)
+            elif keyboard.is_pressed("control"):
+                self.backward(self.step * self.slowspeed)
+            else:
+                self.backward(self.step * self.speed)
+            self.setheading(90)
         else:
             pass
 
 
+#use size of object
     def is_ball_hit(self, ball_pos):
-        if  abs(self.xcor() - ball_pos[0]) <= self.b_width/2 and abs(self.ycor() - ball_pos[1]) <= self.b_height/2:
+        if  abs(self.xcor() - ball_pos[0]) <= self.width/2 and abs(self.ycor() - ball_pos[1]) <= self.height/2:
             return True
         return False
+
+    def _between(self,cur, start, end):
+        return cur >= start and cur <= end    
+
+    def is_item_hit(self, item_pos, item_size):
+        top_paddel_y = self.ycor() + self.height/2
+        bottom_paddel_y = self.ycor() - self.height/2
+        top_item_y =  item_pos[1] + item_size[1] /2
+        bottom_item_y = item_pos[1] - item_size[1] /2
+
+        if bottom_item_y <= top_paddel_y: #Hit on Y coordinate
+            paddle_left = self.xcor() - self.width / 2
+            paddle_right =self.xcor() + self.width / 2
+            item_left = item_pos[0] - item_size[0] /2
+            item_right = item_pos[0] + item_size[0] /2
+            if self._between(item_left, paddle_left, paddle_right):
+                return True
+        return False
+
+
+    def is_powerup_hit(self, powerup:PowerUp):
+        if not powerup.alive:
+            return False
+        else:
+            item_pos = powerup.get_position()
+            item_size = powerup.get_size()
+            return self.is_item_hit(item_pos,item_size )
+
+    
+    #-50 to 50
+    def get_hit_distance(self, ball_pos):
+        offset = ball_pos[0] -self.xcor()
+        #print(f"ball hit paddle {offset} from the center of the paddle")
+        return offset
+            
+
+    
     
     def reset(self):
-        #self.goto(self.screensize[0]/2,self.x_plain_coord)
-        self.goto(20,self.x_plain_coord)
-        self.is_going_left = False
-        self.is_going_right = False
+        self.set_paddle_shape(PaddleSize.DEFAULT)
+        self.goto(self.screensize[0]/2,self.x_plain_coord)
+        
+    def recenter(self):
+        self.goto(self.screensize[0]/2,self.x_plain_coord)
+        
         

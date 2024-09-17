@@ -25,7 +25,10 @@
     <Compile Include="brick.py" />
     <Compile Include="Day87_Proj6_Breakout.py" />
     <Compile Include="field.py" />
+    <Compile Include="gamemodifier.py" />
     <Compile Include="paddle.py" />
+    <Compile Include="paddlesize.py" />
+    <Compile Include="powerup.py" />
     <Compile Include="scoreboard.py" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
