@@ -3,7 +3,6 @@ from gamemodifier import GameModifier
 
 class PowerUp(Turtle):
     
-    #PowerUp(power=GameModifier.BIGPADDLE, step=5)
     def __init__(self,  power : GameModifier, step, size):
         super().__init__()
         self.speed("fastest")
@@ -31,13 +30,24 @@ class PowerUp(Turtle):
                 )
             )
 
-        self.shape("powerup")
 
-        if power == GameModifier.BIGPADDLE or power == GameModifier.SLOW: 
-            self.color("#44ee44")
-            
-        elif power == GameModifier.SMALLPADDLE or power == GameModifier.FAST: 
-            self.color("#ee4444")
+        self.shapesize(stretch_wid=None, stretch_len=None, outline=4)
+        self.shape("powerup")
+        self.pensize(8)
+        match power:
+            case GameModifier.BIGPADDLE:
+                 self.color("#ccffff","#6EC207")
+            case GameModifier.SLOW: 
+                self.color("#6EC207","#009900")  
+            case GameModifier.SMALLPADDLE:  
+                  self.color("#ccffff","#ee4444")
+            case GameModifier.FAST:
+                self.color("#6EC207","#C7253E") 
+                
+            case _:
+                
+                self.color("#FFEB00","#C7253E")
+
 
     def set_position(self, newpos):
         self.anchor_position = newpos
@@ -53,14 +63,14 @@ class PowerUp(Turtle):
     def get_position(self):
         return self.position()  
     
-    def remove(self):
+    def kill(self):
         self.clear()
         self.goto(-500,-500)
         self.alive = 0
         
     def engage(self) -> GameModifier:
         print(f"Engage Power: {self.power}")
-        self.remove()
+        self.kill()
         return self.power
 
 

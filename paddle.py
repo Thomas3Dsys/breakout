@@ -67,18 +67,6 @@ class Paddle(Turtle):
         self.setheading(90)
         self.reset()
 
-
-        # screen.register_shape(
-        #         "paddle",
-        #            (
-        #                (-sX,sY),
-        #                (sX,sY),
-        #                (sX,-sY),
-        #                (-sX,-sY)
-        #            )
-        #        )
-        # self.shape("paddle")
-
     def set_paddle_shape(self, paddle_size:PaddleSize):
         self.paddle_size = paddle_size
         if self.paddle_size == PaddleSize.DEFAULT:
@@ -122,7 +110,7 @@ class Paddle(Turtle):
 
 #use size of object
     def is_ball_hit(self, ball_pos, ball_size):
-        if abs(self.xcor() +  - ball_pos[0] + ball_size/2) <= self.width/2 and abs(self.ycor() - ball_pos[1]+ ball_size/2) <= self.height/2:
+        if abs(self.xcor() -  ball_pos[0] + ball_size/2) <= self.width/2 and abs(self.ycor() - ball_pos[1]+ ball_size/2) <= self.height/2:
             return True
         return False
 
@@ -168,18 +156,5 @@ class Paddle(Turtle):
     def recenter(self):
         self.goto(self.screensize[0]/2,self.x_plain_coord)
 
-
-
-    def clear():
+    def clear(self):
         self.screen.clear()
-
-    # def clear_it(self):
-    #     self.x_plain_coord = 0
-    #     self.size = (0,0)
-    #     self.speed = 0
-    #     self.fast_step = 0
-    #     self.slow_step= 0
-    #     self.step = 0
-    #     self.clear()
-        
-        

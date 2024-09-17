@@ -23,9 +23,7 @@ class BrickField():
         self.brick_y_padding = brick_padding[1]
         self.bricks: List[Brick]= []
         self.colors=["red","orange", "yellow", "blue", "purple"]
-        #self.brick_ids = []
-        #self.reset()
-
+ 
     def draw_field(self):
         id = 0
         y_position = int(self.screensize[1]) - self.y_padding 
@@ -38,9 +36,6 @@ class BrickField():
                 x_position = x_position + self.brick_size[0] + self.brick_x_padding
             y_position = y_position -  (self.brick_size[1]+ self.brick_y_padding) 
         
-        #self.screen.update()   
-        
-
     def remove_dead_bricks(self):
         dead_bricks = [index for index, brick in enumerate(self.bricks) if brick.alive == 0]
         for index in dead_bricks:

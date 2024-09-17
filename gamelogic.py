@@ -1,10 +1,8 @@
 
-from pickle import NONE
+from typing import List
 import random
 from turtle import Screen
 import time
-from typing import Self
-import keyboard
 from paddlesize import PaddleSize
 from scoreboard import Scoreboard
 from paddle import Paddle
@@ -17,7 +15,7 @@ from level import Level
 
 class GameLogic():
     
-    def __init__(self, cur_level):
+    def __init__(self, cur_level:Level):
         self.level = cur_level
 
         self.active_modifiers = {}
@@ -39,6 +37,9 @@ class GameLogic():
                 brick_size=self.level.brick_size,
                 brick_padding=(15,15) 
                 )
+        if self.level.brick_field_colors:
+            self.field.colors = self.level.brick_field_colors
+
         self.field.draw_field()
         
         self.scoreboard = Scoreboard(
@@ -53,10 +54,9 @@ class GameLogic():
                 self.level.ball_size
                 )
 
-        self.powerups = []
-        
+        self.powerups : List[PowerUp]= []
         self.scoreboard.write_menu()
-        self.ball.reset()
+        self.ball.recenter()
         self.populate_powerups()
         self.paddle.reset()
         self.last_print = 0
@@ -71,7 +71,6 @@ class GameLogic():
         self.active_modifiers = {}
         #ball_start_position = (self.level.screensize[0]/2, cur_level.screensize[1]/2-40)
         
-        self.ball.reset()
         score = self.scoreboard.score 
         
         self.scoreboard.reset()
@@ -79,16 +78,18 @@ class GameLogic():
         self.paddle.reset()
         self.field.reset()
         
+        #remove all power ups
         for powerup in self.powerups:
-            powerup.remove()
-
-        for index in range(len(self.powerups)-1,-1,-1):
-            self.powerups.pop(index)
+            powerup.kill()
+            
+        self.remove_dead_powerups()
         
         self.scoreboard.screensize = self.level.screensize
         self.paddle.screensize = self.level.screensize
         self.ball.screensize = self.level.screensize
         self.field.screensize = self.level.screensize
+        self.paddle.recenter()
+        self.ball.recenter()
         
         self.scoreboard.display()
         self.scoreboard.write_menu()
@@ -119,9 +120,6 @@ class GameLogic():
          self.scoreboard.toggle_menu()
 
     def handle_powerups(self, ):
-        remove_powerup_indexes = []
-        
-
         #for all active power ups
         for p in range(0,len(self.powerups)):
             powerup = self.powerups[p]
@@ -154,17 +152,21 @@ class GameLogic():
                     
                 self.active_modifiers[powerup.engage()] = power
 
-            # is power up dead? remove
+            # make fallen powerups dead
             if powerup.get_position()[1] <= -powerup.shape_height/2:
-                powerup.alive = 0
-                remove_powerup_indexes.append(p)
-
+                powerup.kill()
         
         for powerup in self.powerups:
             powerup.move()
 
-        for q in range(0,len(remove_powerup_indexes)):
-            self.powerups.pop(q)
+        self.remove_dead_powerups()
+
+
+    def remove_dead_powerups(self):
+        for index in range(len(self.powerups)-1,-1,-1):
+           if self.powerups[index].alive == 0:
+                self.powerups[index].kill()
+                self.powerups.pop(index)
 
       
     def handle_gamemodifiers(self):
@@ -264,9 +266,5 @@ class GameLogic():
                      if int(time_left) < self.last_print: # only print for ever new second
                         print(f"{cur_modifier} Time Left :{int(time_left)}")  #print
                         self.last_print = int(time_left) # update print restritor counter
-                      
-            #else:
-             #   wait_time = default_wait_time
-                #scoreboard.modify_active_powerups(GameModifier.SLOW, False)
-                
+
         return power_obj

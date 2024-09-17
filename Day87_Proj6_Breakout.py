@@ -2,23 +2,24 @@
 # import random
 from turtle import Screen
 import time
-import keyboard
-
-from gamemodifier import GameModifier
 from level import Level
 from gamelogic import GameLogic
 
+
+
+level_itr = 2
 #move to levels file?
 levels = [ Level(1,
-              brick_array_size = (4,1), # (9,2)
+              brick_array_size =  (9,2),
               default_paddle_size = (120,22),
               default_wait_time =.06,
-              num_powerups = 8,
+              num_powerups = 7,
               bigpaddle_active_time = 30
                 ),
           Level(2, 
               brick_array_size = (9,4),
-              num_powerups = 6
+              num_powerups = 5,
+              brick_field_colors = ["#C96868","#FADFA1","#FFF4EA","#7EACB5"]
               ),
           Level(3, 
               screensize = (1015,800),
@@ -26,8 +27,9 @@ levels = [ Level(1,
               ball_size = 18,
               default_paddle_size = (90,18),
               default_wait_time =.04,
-              num_powerups = 2,
-              bigpaddle_active_time = 10
+              num_powerups = 40,
+              bigpaddle_active_time = 10,
+              brick_field_colors = ["#7C00FE","#F9E400","#FFAF00","#F5004F","#007F73","#4CCD99","#FFC700"]
               )    
           ]
 
@@ -82,14 +84,6 @@ def restart():
     next_level(True)
 
 
-def brake():##### CHEAT / DEBUG #####
-    game.field.remove_brick_by_id(game.field.bricks[0].id)
-    game.field.remove_dead_bricks()
-    screen.update()
-
-def go_fast():##### CHEAT / DEBUG #####
-     global wait_time
-     wait_time = 0
 
 
 
@@ -101,18 +95,13 @@ def setup_listen():
     screen.onkey(key="Right", fun=game.paddle.right)#do_right
     screen.onkey(key="p", fun=pause)
     screen.onkey(key="space", fun=start)
-    
-    screen.onkey(key="f", fun=go_fast)##### CHEAT / DEBUG #####
-    screen.onkey(key="b", fun=brake)##### CHEAT / DEBUG #####
    
     screen.onkey(key="r", fun=set_restart_flag)
     screen.onkey(key="x", fun=exit_app)
 
-
     screen.onkey(key="Tab", fun=game.scoreboard.toggle_menu)
 
 
-level_itr = 0
 setup_screen(levels[level_itr].screensize)
 game = GameLogic(levels[level_itr])
 setup_listen()
@@ -142,9 +131,6 @@ def next_level(restart = False):
         game.scoreboard.display_start_info(f"Level {game.level.iteration}",start_display_y)
     else:
         game.scoreboard.level_complete(f"Level {game.level.iteration}",start_display_y)
-    
-
-    
 
 print(f"wait:{wait_time}")
 
@@ -193,7 +179,6 @@ while is_game_on:
      
     if restart_flag:
         restart()
-
 
     screen.update()
    

@@ -19,17 +19,6 @@ class Brick(Turtle):
         self.anchor_position  = (position[0], position[1])
         
         screen = Screen()
-        # screen.register_shape(
-        #     "brick",
-        #    (
-               
-        #     (0,0),
-        #     (self.brick_width, 0),
-        #     (self.brick_width, self.brick_height),
-        #     (0, self.brick_height)
-        #    )
-        #                           )
-
 
         hX = self.brick_width /2
         hY = self.brick_height /2
@@ -76,8 +65,6 @@ class Brick(Turtle):
         return self.powerup  
 
     def is_ball_hit(self, ball_pos, ball_size):
-        #bricks position is its top left
-        #ball is centered around position and has ball_size
         if self.alive == 0:
             return False
         
@@ -88,8 +75,7 @@ class Brick(Turtle):
         
         if not x_hit:
             return False
-        #top of bottom?
-        #anchor is bottom left
+        
         brick_bottom = self.anchor_position[1] - self.brick_height
         brick_top = self.anchor_position[1] + self.brick_height
 
@@ -99,9 +85,7 @@ class Brick(Turtle):
         y_hit = ball_bottom_in_y_area or ball_top_in_y_area
         
         if y_hit:
-            #self.remove() #removed by field
             return True
-    
 
     def hit_color(self):
         self.color("black")

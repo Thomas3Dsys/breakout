@@ -17,9 +17,9 @@ class Ball(Turtle):
         self.shape("circle")
         self.step = step
         self.screensize = screensize
-        self.reset()
+        self.recenter()
         
-    def reset(self):
+    def recenter(self):
         self.ball_heading = random.randint(250,290)
         self.goto(self.starting_pos)
 

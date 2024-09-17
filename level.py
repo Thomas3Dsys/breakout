@@ -8,7 +8,8 @@ class Level():
         #size of the brick field
         self.brick_size= kwargs.get('brick_size',(60,25))
         self.brick_array_size = kwargs.get('brick_array_size',(9,5))
-        
+        self.brick_field_colors = kwargs.get('brick_field_colors',None)
+
         #Ball size
         self.ball_size =  kwargs.get('ball_size',20)
 

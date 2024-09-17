@@ -133,3 +133,18 @@ offpower = {
             "is_active":False,
             "activated":False
                              }
+
+
+
+
+
+
+
+def brake():##### CHEAT / DEBUG #####
+    game.field.remove_brick_by_id(game.field.bricks[0].id)
+    game.field.remove_dead_bricks()
+    screen.update()
+
+def go_fast():##### CHEAT / DEBUG #####
+     global wait_time
+     wait_time = 0
