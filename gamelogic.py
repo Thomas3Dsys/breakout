@@ -63,33 +63,45 @@ class GameLogic():
 
     def new_level(self, cur_level):
         self.level = cur_level
+
+        for modifier in list(GameModifier):
+            self.scoreboard.modify_active_powerups(modifier , False)
+            self.do_modifier_affect(modifier , False)
+
         self.active_modifiers = {}
         #ball_start_position = (self.level.screensize[0]/2, cur_level.screensize[1]/2-40)
         
         self.ball.reset()
         score = self.scoreboard.score 
+        
         self.scoreboard.reset()
         self.scoreboard.score = score 
         self.paddle.reset()
         self.field.reset()
+        
+        for powerup in self.powerups:
+            powerup.remove()
 
-
+        for index in range(len(self.powerups)-1,-1,-1):
+            self.powerups.pop(index)
         
         self.scoreboard.screensize = self.level.screensize
         self.paddle.screensize = self.level.screensize
         self.ball.screensize = self.level.screensize
         self.field.screensize = self.level.screensize
         
+        self.scoreboard.display()
+        self.scoreboard.write_menu()
+        
         self.field.xcount= self.level.brick_array_size[0]
         self.field.ycount=self.level.brick_array_size[1]
         self.field.brick_size=self.level.brick_size
-        
         self.field.draw_field()
+        
         self.powerups = []
-        self.scoreboard.write_menu()
+        
         self.populate_powerups()
         self.last_print = 0
-
 
     def populate_powerups(self):
         num_to_populate = min(self.field.field_size,self.level.num_powerups)

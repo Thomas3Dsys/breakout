@@ -21,8 +21,8 @@ levels = [ Level(1,
               num_powerups = 6
               ),
           Level(3, 
-              screensize = (1000,800),
-              brick_array_size = (12,6),
+              screensize = (1015,800),
+              brick_array_size = (13,6),
               ball_size = 18,
               default_paddle_size = (90,18),
               default_wait_time =.04,
@@ -51,6 +51,7 @@ def reset_screen(screensize):
     global screen    
     screen = Screen()
     screen.setup(width=screensize[0], height=screensize[1])
+    screen.setworldcoordinates(0,0,screensize[0], screensize[1])
 
 
 def exit_app():

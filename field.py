@@ -90,8 +90,6 @@ class BrickField():
          self.bricks[index].remove()
          self.bricks.pop(index)
 
-
-
     def has_brick(self, b_id):
          found_bricks = [index for index, brick in enumerate(self.bricks) if brick.id == b_id]
          return len(found_bricks) > 0

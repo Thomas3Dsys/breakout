@@ -53,11 +53,14 @@ class PowerUp(Turtle):
     def get_position(self):
         return self.position()  
     
-    def engage(self) -> GameModifier:
-        print(f"Engage Power: {self.power}")
+    def remove(self):
         self.clear()
         self.goto(-500,-500)
         self.alive = 0
+        
+    def engage(self) -> GameModifier:
+        print(f"Engage Power: {self.power}")
+        self.remove()
         return self.power
 
 
