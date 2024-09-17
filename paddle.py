@@ -7,6 +7,7 @@ class Paddle(Turtle):
     
     def __init__(self,  screensize, **kwargs):
         super().__init__()
+        self.speed("fastest")
         
         self.x_plain_coord = kwargs.get('x_plain_coord',"default value")
         self.size = kwargs.get('size',(100,20))

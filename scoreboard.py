@@ -8,6 +8,7 @@ class Scoreboard(Turtle):
     
     def __init__(self,  screensize, maxscore):
         super().__init__()
+        self.speed("fastest")
         self.penup()
         self.hideturtle()
         self.color("white")

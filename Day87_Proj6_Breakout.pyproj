@@ -25,6 +25,7 @@
     <Compile Include="brick.py" />
     <Compile Include="Day87_Proj6_Breakout.py" />
     <Compile Include="field.py" />
+    <Compile Include="gamelogic.py" />
     <Compile Include="gamemodifier.py" />
     <Compile Include="level.py" />
     <Compile Include="paddle.py" />

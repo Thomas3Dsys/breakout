@@ -6,6 +6,7 @@ class PowerUp(Turtle):
     #PowerUp(power=GameModifier.BIGPADDLE, step=5)
     def __init__(self,  power : GameModifier, step, size):
         super().__init__()
+        self.speed("fastest")
         self.penup()
         self.size = size
         self.power = power

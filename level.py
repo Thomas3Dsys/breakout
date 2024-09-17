@@ -21,7 +21,7 @@ class Level():
         #Game Speed
         self.default_wait_time =  kwargs.get('default_wait_time',.05)
         self.slow_wait_time =  kwargs.get('slow_wait_time',.1)
-        self.fast_wait_time =  kwargs.get('fast_wait_time',.0325)
+        self.fast_wait_time =  kwargs.get('fast_wait_time',.035)
         
         #Power Ups
         self.num_powerups =  kwargs.get('num_powerups',10)

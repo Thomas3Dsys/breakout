@@ -8,6 +8,7 @@ class Brick(Turtle):
     
     def __init__(self, position, size, color, id):
         super().__init__()
+        self.speed("fastest")
         
         #self.penup()
         self.size = size

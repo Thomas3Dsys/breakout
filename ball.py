@@ -5,6 +5,7 @@ class Ball(Turtle):
     
     def __init__(self, screensize, starting_pos, step = 10, size = 20):
         super().__init__()
+        self.speed("fastest")
         self.starting_pos = starting_pos
         self.color("white")
         self.penup()

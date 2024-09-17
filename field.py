@@ -9,6 +9,7 @@ class BrickField(Turtle):
     
     def __init__(self, screen, screensize, field_padding, xcount, ycount, brick_size, brick_padding):
         super().__init__()
+        self.speed("fastest")
         #Field Padding
         self.x_padding = field_padding[0]
         self.y_padding = field_padding[1]
