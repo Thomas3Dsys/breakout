@@ -10,41 +10,52 @@ from ball import Ball
 from field import BrickField
 from powerup import PowerUp
 from gamemodifier import GameModifier
-
-
-
-screen = Screen()
+from level import Level
 screensize =(720,800)
-screen.setup(width=screensize[0], height=screensize[1])
-screen.bgcolor("black")
-screen.title("BREAKOUT")
-screen.mode("world")
-screen.setworldcoordinates(0,0,screensize[0], screensize[1])
-default_wait_time = .025
-wait_time = .025
-wait_increment = .025
-center = (screensize[0]/2, screensize[1]/2)
-left= (20, screensize[1]/2)
-top= (screensize[0]/2, screensize[1]-20)
-
-screen.tracer(0) # only draw when asked to on refresh of screen
-
 xcount= 9
 ycount= 5
-x_plain_coord = 40
-default_paddle_size = (100,20)
 
-paddle = Paddle(screensize = screensize, x_plain_coord=x_plain_coord, size= default_paddle_size)
+brick_size=(60,25)
+powerup_active_time_multipliers = (.8, 1.3) 
 
-# screen.update()
-# paddle = paddle
-# paddle.recenter()
-# screen.update()
+#defaults
+level1 = Level()
 
-field = BrickField(screen=screen, screensize = screensize,field_padding =(20,100),xcount= xcount, ycount=ycount, brick_size=(60,25), brick_padding=(15,15) )
-scoreboard = Scoreboard(screensize, xcount * ycount )
-ball = Ball(screensize, center)
-is_paused = True
+#change whas is needed
+level2 = Level(
+    num_powerups = 10,
+    slow_wait_time = .1,
+    default_wait_time = .05,
+    fast_wait_time = .0325,
+    ball_size = 20,
+    powerup_step_variation = (3,7),
+    powerup_size = (50,15),
+    bigpaddle_active_time = 30,
+    smallpaddle_active_time=7,
+    slow_active_time = 10,
+    fast_active_time = 7,
+    good_powerup_score_add = 2,
+    bad_powerup_score_add = 4,
+    x_plain_coord = 40,
+    default_paddle_size = (100,20),
+    paddle_fast_step = 55,
+    paddle_step = 35,
+    paddle_slow_step = 10)
+
+cur_level = level1
+
+
+#World Setup
+screen = Screen()
+screen.setup(width=screensize[0], height=screensize[1])
+screen.title("BRICK BRAKE")
+screen.mode("world")
+screen.setworldcoordinates(0,0,screensize[0], screensize[1])
+center = (screensize[0]/2, screensize[1]/2)
+screen.tracer(0) # only draw when asked to on refresh of screen
+screen.bgcolor("black")
+wait_time = cur_level.default_wait_time
+
 
 active_modifiers = {}
 offpower = {
@@ -64,24 +75,20 @@ def restart():
     screen.update()
     is_paused = True
 
-scoreboard.write_menu()
-screen.update()
-
-is_game_on = True
-
 def exit_app():
     global is_game_on 
     is_game_on = False
     exit()
 
-def toggle_menu():
-    scoreboard.toggle_menu()
-
 def start():
     global is_paused
     is_paused = False
     scoreboard.do_start()
-
+    
+def pause():
+    global is_paused
+    is_paused = not is_paused   
+    scoreboard.pause(is_paused)
 
 ##CHEATS / TESTING
 def small():
@@ -111,57 +118,33 @@ def default():
         active_modifiers[GameModifier.BIGPADDLE] = offpower
         active_modifiers[GameModifier.SMALLPADDLE] = offpower
     
-def increase_speed():
-    global default_wait_time
+def go_fast():
+    global wait_time
     if keyboard.is_pressed("alt"):
-        default_wait_time = .0125
+        wait_time = cur_level.fast_wait_time
         print("FAST")
 
 def regular_speed():
-    global default_wait_time
+    global wait_time
     if keyboard.is_pressed("alt"):
-        default_wait_time = .025
+        wait_time = cur_level.default_wait_time
         print("REGULAR")
 
-def decrease_speed():#increase wait time
-    global default_wait_time
+def go_slow():#increase wait time
+    global wait_time
     if keyboard.is_pressed("alt"):
-        default_wait_time = .1
+        wait_time = cur_level.slow_wait_time
         print("SLOW")
-
 ## END CHEATS / TESTING
 
-def pause():
-    global is_paused
-    is_paused = not is_paused   
-    scoreboard.pause(is_paused)
 
-screen.listen()
-screen.onkey(key="Left", fun=paddle.left)
-screen.onkey(key="Right", fun=paddle.right)
-screen.onkey(key="p", fun=pause)
-screen.onkey(key="space", fun=start)
-screen.onkey(key="r", fun=restart)
-screen.onkey(key="x", fun=exit_app)
+def populate_powerups():
+    for i in range(0,cur_level.num_powerups):
+        speed  = random.randint(cur_level.powerup_step_variation[0],cur_level.powerup_step_variation[1])
+        field.add_random_powerup(PowerUp(power=random.choice(list(GameModifier)), step=speed, size=cur_level.powerup_size))
 
-screen.onkey(key="1", fun=decrease_speed)
-screen.onkey(key="2", fun=regular_speed)
-screen.onkey(key="3", fun=increase_speed)
-
-screen.onkey(key="Tab", fun=toggle_menu)
-
-screen.onkey(key="s", fun=small)
-screen.onkey(key="l", fun=large)
-screen.onkey(key="d", fun=default)
-
-
-screen.bgcolor("black")
-is_round_on = True
-ball.reset()
-field.draw_field()
-
-powerups = []
-powerup_active_time_multipliers = (.8, 1.3) 
+def toggle_menu():
+    scoreboard.toggle_menu()
 
 def handle_powerups():
     remove_powerup_indexes = []
@@ -169,27 +152,21 @@ def handle_powerups():
     for p in range(0,len(powerups)):
         powerup = powerups[p]
         
-        #randomize active length within range for each powerup type
-        # slow  = 10 * (random .8 to 1.3)
-        # fast  =  7 * (random .8 to 1.3)
-        # Large = 30 * (random .8 to 1.3)
-        # Small = 10 * (random .8 to 1.3)
-
         if paddle.is_powerup_hit(powerup):
             active_time = 0
-            random_multiplier = random.uniform(powerup_active_time_multipliers [0], powerup_active_time_multipliers [1])
-            score_add = 2
+            random_multiplier = random.uniform(powerup_active_time_multipliers[0], powerup_active_time_multipliers[1])
+            score_add = cur_level.good_powerup_score_add
             match powerup.power:
                 case GameModifier.BIGPADDLE:
-                    active_time = 30 * random_multiplier
+                    active_time = cur_level.bigpaddle_active_time * random_multiplier
                 case GameModifier.SMALLPADDLE:
-                    active_time = 10 * random_multiplier
-                    score_add = 4 # more points for hard powerUps (downs)
+                    active_time = cur_level.smallpaddle_active_time * random_multiplier
+                    score_add = cur_level.bad_powerup_score_add
                 case GameModifier.FAST:
-                    active_time = 7 * random_multiplier
-                    score_add = 4 
+                    active_time =  cur_level.fast_active_time * random_multiplier
+                    score_add = cur_level.bad_powerup_score_add 
                 case GameModifier.SLOW:
-                    active_time = 10 * random_multiplier
+                    active_time = cur_level.slow_active_time* random_multiplier
                 case _:
                     pass
 
@@ -227,17 +204,17 @@ def handle_fast_powerup():
             if elapsed > fast['active_length']:
                 fast['is_active'] = False
                 scoreboard.modify_active_powerups(GameModifier.FAST, False)
-                wait_time = default_wait_time
+                wait_time = cur_level.default_wait_time
             if fast['is_active']:
                 print(f"Fast Time Left :{fast['active_length'] - elapsed}")  
                 if not fast['activated']:
                     fast['activated'] = True
-                    wait_time = .0125
+                    wait_time = cur_level.fast_wait_time
                     fast['start_time'] = time.time()
                     scoreboard.modify_active_powerups(GameModifier.SLOW, False)
                     scoreboard.modify_active_powerups(GameModifier.FAST, True)
         else:
-            wait_time = default_wait_time
+            wait_time = cur_level.default_wait_time
             scoreboard.modify_active_powerups(GameModifier.FAST, False)
     return fast
 
@@ -254,12 +231,12 @@ def handle_slow_powerup():
             if elapsed > slow['active_length']:
                  slow['is_active'] = False
                  scoreboard.modify_active_powerups(GameModifier.SLOW, False)
-                 wait_time = default_wait_time
+                 wait_time = cur_level.default_wait_time
             if slow['is_active']:
                   print(f"Slow Time Left :{slow['active_length'] - elapsed}")  
                   if not slow['activated']:
                     slow['activated'] = True
-                    wait_time = .05   
+                    wait_time = cur_level.slow_wait_time   
                     slow['start_time'] = time.time()
                     scoreboard.modify_active_powerups(GameModifier.FAST, False)
                     scoreboard.modify_active_powerups(GameModifier.SLOW, True)
@@ -316,37 +293,6 @@ def handle_smallpaddle_powerup():
                     scoreboard.modify_active_powerups(GameModifier.SMALLPADDLE, True)
     return paddle_power
 
-
-
-# def handle_default_paddle():
-#     global paddle
-#     is_big = False
-#     is_small = False
-    
-#     if GameModifier.BIGPADDLE in active_modifiers:
-#         lg_paddle = active_modifiers[GameModifier.BIGPADDLE]
-#         if lg_paddle['is_active']:
-#             is_big = True
-#         else:
-#             is_big = False
-#             scoreboard.modify_active_powerups(GameModifier.BIGPADDLE, False)
-
-#     if GameModifier.SMALLPADDLE  in active_modifiers:
-#         sm_paddle = active_modifiers[GameModifier.SMALLPADDLE]
-#         if sm_paddle['is_active']:
-#             is_small = True
-#         else:
-#             is_small = False
-#             scoreboard.modify_active_powerups(GameModifier.SMALLPADDLE, False)
-            
-    
-        
-#     if not(is_big or is_small):
-#             scoreboard.modify_active_powerups(GameModifier.BIGPADDLE, False)    
-#             scoreboard.modify_active_powerups(GameModifier.SMALLPADDLE, False)    
-#             paddle.set_paddle_shape(PaddleSize.DEFAULT)
-
-            
 def handle_gamemodifiers():
     global wait_time
 
@@ -357,24 +303,65 @@ def handle_gamemodifiers():
     slow = handle_slow_powerup()
     handle_bigpaddle_powerup()
     handle_smallpaddle_powerup()
-    #handle_default_paddle()
     
     if not fast and not slow:
-        wait_time = default_wait_time
+        wait_time = cur_level.default_wait_time
 
 
-for i in range(0,20):
-    speed  = random.randint(3,7)
-    field.add_random_powerup(PowerUp(power=random.choice(list(GameModifier)), step=speed))
-    
+#Game Objects        
 
+      
+
+paddle = Paddle(screensize = screensize, 
+                x_plain_coord=cur_level.x_plain_coord, 
+                size= cur_level.default_paddle_size,
+                fast_step = cur_level.paddle_fast_step,
+                step = cur_level.paddle_step,
+                slow_step= cur_level.paddle_slow_step
+                )
+field = BrickField(screen=screen, screensize = screensize,field_padding =(20,100),xcount= xcount, ycount=ycount, brick_size=brick_size, brick_padding=(15,15) )
+scoreboard = Scoreboard(screensize, xcount * ycount )
+ball = Ball(screensize, center, cur_level.ball_size)
+is_paused = True
+scoreboard.write_menu()
+screen.update()
+is_game_on = True
+is_round_on = True
+ball.reset()
+field.draw_field()
+powerups = []
+populate_powerups()
 active_powerups = []
+
+
+#Handle Inputs
+screen.listen()
+screen.onkey(key="Left", fun=paddle.left)
+screen.onkey(key="Right", fun=paddle.right)
+screen.onkey(key="p", fun=pause)
+screen.onkey(key="space", fun=start)
+screen.onkey(key="r", fun=restart)
+screen.onkey(key="x", fun=exit_app)
+
+screen.onkey(key="1", fun=go_slow)
+screen.onkey(key="2", fun=regular_speed)
+screen.onkey(key="3", fun=go_fast)
+
+screen.onkey(key="Tab", fun=toggle_menu)
+
+screen.onkey(key="s", fun=small)
+screen.onkey(key="l", fun=large)
+screen.onkey(key="d", fun=default)
+
+
+#Main Game Loop
 while is_game_on:
     if not is_paused:
 
         handle_gamemodifiers()
 
         #game speed
+        print(f"w:{wait_time}")
         time.sleep(wait_time)
         
         #check game over
@@ -409,10 +396,6 @@ while is_game_on:
         ball.move()
         
     screen.update()
-    
-
-
-
 
 screen.update()
 screen.exitonclick()

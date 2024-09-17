@@ -5,18 +5,26 @@ from powerup import PowerUp
 
 class Paddle(Turtle):
     
-    def __init__(self,  screensize, x_plain_coord, size):
+    def __init__(self,  screensize, **kwargs):
         super().__init__()
         
+        self.x_plain_coord = kwargs.get('x_plain_coord',"default value")
+        self.size = kwargs.get('size',(100,20))
+        self.speed = kwargs.get('speed', 5)
+        self.fast_step = kwargs.get('fast_step', 10)
+        self.slow_step= kwargs.get('slow_step',2)
+        self.step = kwargs.get('step', '10')
+
+
         screen = Screen() 
-        sX = int(size[0]/2)
-        sY = int(size[1]/2)
+        sX = int(self.size[0]/2)
+        sY = int(self.size[1]/2)
         
-        sXL = int(size[0]/2)+20
-        sYL = int(size[1]/2)+2
+        sXL = int(self.size[0]/2)+20
+        sYL = int(self.size[1]/2)+2
         
-        sXS = int(size[0]/2)-20
-        sYS = int(size[1]/2)-2
+        sXS = int(self.size[0]/2)-20
+        sYS = int(self.size[1]/2)-2
         screen.register_shape(
             "lpaddle",
                 (
@@ -50,19 +58,16 @@ class Paddle(Turtle):
             )
         
             
-        self.width = size[0]
-        self.default_width = size[0]
-        self.height = size[1]
+        self.width = self.size[0]
+        self.default_width = self.size[0]
+        self.height = self.size[1]
         self.screensize = screensize
         self.color("white")
         self.penup()
-        self.x_plain_coord = x_plain_coord
+        
         self.reset()
        
-        self.speed = 5
-        self.fastspeed = 10
-        self.slowspeed = 2
-        self.step = 10
+
         self.paddlesize = PaddleSize.DEFAULT
         
        
@@ -99,11 +104,11 @@ class Paddle(Turtle):
         if self.xcor() > self.width/2:
             self.setheading(180)
             if keyboard.is_pressed("shift"):
-                self.forward(self.step * self.fastspeed)
+                self.forward(self.fast_step)
             elif keyboard.is_pressed("control"):
-                self.forward(self.step * self.slowspeed)
+                self.forward(self.slow_step)
             else:
-                self.forward(self.step * self.speed)
+                self.forward(self.step)
             self.setheading(90)
     
 
@@ -112,11 +117,11 @@ class Paddle(Turtle):
         if self.xcor() < self.screensize[0] - self.width/2:
             self.setheading(180)
             if keyboard.is_pressed("shift"):
-                self.backward(self.step * self.fastspeed)
+                self.backward(self.fast_step)
             elif keyboard.is_pressed("control"):
-                self.backward(self.step * self.slowspeed)
+                self.backward(self.slow_step)
             else:
-                self.backward(self.step * self.speed)
+                self.backward(self.step)
             self.setheading(90)
         else:
             pass

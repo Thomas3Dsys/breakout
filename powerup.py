@@ -4,12 +4,10 @@ from gamemodifier import GameModifier
 class PowerUp(Turtle):
     
     #PowerUp(power=GameModifier.BIGPADDLE, step=5)
-    def __init__(self,  power : GameModifier, step):
+    def __init__(self,  power : GameModifier, step, size):
         super().__init__()
-        
-        #self.penup()
-
-        self.size = (40,20)
+        self.penup()
+        self.size = size
         self.power = power
         self.alive = 0
         self.shape_width = self.size[0]
@@ -18,19 +16,8 @@ class PowerUp(Turtle):
         self.step = step
         self.setheading(270)
         self.goto(-600,-600)
-        
         screen = Screen()
-        # screen.register_shape(
-        #     "powerup",
-        #    (
-               
-        #     (0,0),
-        #     (self.brick_width, 0),
-        #     (self.brick_width, self.brick_height),
-        #     (0, self.brick_height)
-        #    )
-        #                           )
-
+       
         hX = self.shape_width /2
         hY = self.shape_height /2
         screen.register_shape(

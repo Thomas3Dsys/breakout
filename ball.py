@@ -3,13 +3,13 @@ import random
 
 class Ball(Turtle):
     
-    def __init__(self, screensize, starting_pos, step = 10):
+    def __init__(self, screensize, starting_pos, step = 10, size = 20):
         super().__init__()
         self.starting_pos = starting_pos
         self.color("white")
         self.penup()
         self.goto(starting_pos)
-        self.size = 20
+        self.size = size
         self.pensize(self.size)
         self.hsize = self.size / 2
         self.shape("circle")
