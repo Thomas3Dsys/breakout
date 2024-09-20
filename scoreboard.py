@@ -26,7 +26,7 @@ class Scoreboard(Turtle):
            GameModifier.SMALLPADDLE: False,
            GameModifier.BIGPADDLE: False
            }
-       
+
     def level_complete(self,level_name, ypos):
         self.display()
         self.color("white")

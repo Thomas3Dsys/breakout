@@ -26,6 +26,7 @@
     <Compile Include="code_graveyard.py" />
     <Compile Include="Day87_Proj6_Breakout.py" />
     <Compile Include="field.py" />
+    <Compile Include="game.py" />
     <Compile Include="gamelogic.py" />
     <Compile Include="gamemodifier.py" />
     <Compile Include="level.py" />
@@ -33,6 +34,7 @@
     <Compile Include="paddlesize.py" />
     <Compile Include="powerup.py" />
     <Compile Include="scoreboard.py" />
+    <Compile Include="test.py" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in

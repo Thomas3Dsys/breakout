@@ -36,7 +36,7 @@ class Brick(Turtle):
         
         self.goto(position[0]-hX,position[1])
         self.color("white")
-        self.write(self.id,False, "right", ('Arial', 10))
+        #self.write(self.id,False, "right", ('Arial', 10))
         
         self.goto(position)
         self.color(color)

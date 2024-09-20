@@ -19,7 +19,6 @@ class GameLogic():
         self.level = cur_level
 
         self.active_modifiers = {}
-        ball_start_position = (self.level.screensize[0]/2, cur_level.screensize[1]/2-40)
         
         self.paddle = Paddle(
                 screensize = self.level.screensize, 
@@ -27,7 +26,8 @@ class GameLogic():
                 size= self.level.default_paddle_size,
                 fast_step = self.level.paddle_fast_step,
                 step = self.level.paddle_step,
-                slow_step= self.level.paddle_slow_step
+                slow_step= self.level.paddle_slow_step,
+                paddle_start_x = self.level.paddle_start_x
                 )
 
         self.field = BrickField(
@@ -50,7 +50,8 @@ class GameLogic():
         
         self.ball = Ball(    
                 self.level.screensize, 
-                ball_start_position,
+                self.level.ball_start_position,
+                10,#step is 10
                 self.level.ball_size
                 )
 

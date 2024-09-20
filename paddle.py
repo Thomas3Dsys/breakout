@@ -15,6 +15,9 @@ class Paddle(Turtle):
         self.fast_step = kwargs.get('fast_step', 10)
         self.slow_step= kwargs.get('slow_step',2)
         self.step = kwargs.get('step', '10')
+        
+        self.paddle_start_x = kwargs.get('paddle_start_x',screensize[0]/2)
+        self.paddle_start = ( self.paddle_start_x, self.x_plain_coord)
 
         screen = Screen() 
         sX = int(self.size[0]/2)
@@ -110,9 +113,13 @@ class Paddle(Turtle):
 
 #use size of object
     def is_ball_hit(self, ball_pos, ball_size):
-        if abs(self.xcor() -  ball_pos[0] + ball_size/2) <= self.width/2 and abs(self.ycor() - ball_pos[1]+ ball_size/2) <= self.height/2:
-            return True
-        return False
+
+        #first quick check: is ball at paddle Y level
+        hit_y= ball_pos[1] - ball_size/2 <= self.ycor() + self.height/2
+        if not hit_y:
+            return False
+        
+        return self.is_item_hit(ball_pos, (ball_size, ball_size))
 
     def _between(self,cur, start, end):
         return cur >= start and cur <= end    
@@ -151,10 +158,10 @@ class Paddle(Turtle):
     
     def reset(self):
         self.set_paddle_shape(PaddleSize.DEFAULT)
-        self.goto(self.screensize[0]/2,self.x_plain_coord)
+        self.goto(self.paddle_start)
         
     def recenter(self):
-        self.goto(self.screensize[0]/2,self.x_plain_coord)
+        self.goto(self.paddle_start)
 
     def clear(self):
         self.screen.clear()

@@ -11,7 +11,9 @@ class Level():
         self.brick_field_colors = kwargs.get('brick_field_colors',None)
 
         #Ball size
-        self.ball_size =  kwargs.get('ball_size',20)
+        self.ball_size =  kwargs.get('ball_size',1)
+        start = (self.screensize[0]/2, self.screensize[1]/2-40)
+        self.ball_start_position = kwargs.get('ball_start_position',start )
 
         #Paddle details
         self.x_plain_coord = kwargs.get('x_plain_coord', 40)
@@ -19,11 +21,13 @@ class Level():
         self.paddle_fast_step =  kwargs.get('paddle_fast_step',70)
         self.paddle_step =  kwargs.get('paddle_step',35)
         self.paddle_slow_step =  kwargs.get('paddle_slow_step',10)
-        
+        self.paddle_start_x =  kwargs.get('paddle_start_x',self.screensize[0]/2)
+
+
         #Game Speed
-        self.default_wait_time =  kwargs.get('default_wait_time',.05)
-        self.slow_wait_time =  kwargs.get('slow_wait_time',.1)
-        self.fast_wait_time =  kwargs.get('fast_wait_time',.035)
+        self.default_wait_time =  kwargs.get('default_wait_time',.025)
+        self.slow_wait_time =  kwargs.get('slow_wait_time',.06)
+        self.fast_wait_time =  kwargs.get('fast_wait_time',0.00875)
         
         #Power Ups
         self.num_powerups =  kwargs.get('num_powerups',10)
